@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Tour Navigator" />
+  <meta name="theme-color" content="#061326" />
+  <title>Tour Navigator – Route des Grandes Alpes</title>
+  <style>
+:root{
+  --bg:#f8f7fb;--ink:#111827;--muted:#5b6475;--navy:#061326;--purple:#5b20d6;--purple2:#7c3aed;
+  --green:#07964a;--orange:#f28a00;--blue:#0867dd;--line:#e5e7eb;--card:#fff;--soft:#f5f3ff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:linear-gradient(180deg,#fff 0,#f7f7fb 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+button,select,input,textarea{font:inherit}
+.app{max-width:980px;margin:0 auto;background:var(--bg);min-height:100vh}
+header{background:linear-gradient(180deg,#041024 0%,#081a33 100%);color:white;padding:calc(18px + env(safe-area-inset-top)) 18px 20px;border-bottom:1px solid rgba(255,255,255,.12);position:relative;overflow:hidden}
+header:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 25% -10%,rgba(124,58,237,.45),transparent 30%),radial-gradient(circle at 86% 10%,rgba(8,103,221,.22),transparent 26%);pointer-events:none}
+.hero{position:relative;display:flex;align-items:center;justify-content:center;gap:14px;text-align:left}
+.logo-mark{font-size:54px;filter:drop-shadow(0 8px 14px rgba(124,58,237,.35))}
+h1{font-size:clamp(34px,7vw,58px);line-height:.95;margin:0;font-weight:900;letter-spacing:-.05em}
+.subhead{font-size:clamp(18px,3vw,28px);color:rgba(255,255,255,.72);margin-top:8px}
+.gear{position:absolute;right:4px;top:10px;border:0;background:rgba(255,255,255,.12);color:white;width:48px;height:48px;border-radius:999px;font-size:24px}
+main{padding:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:16px;box-shadow:0 12px 28px rgba(15,23,42,.06)}
+.section-title{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-weight:900;text-transform:uppercase;letter-spacing:.02em}
+.nav-card{border-color:#c4b5fd;background:linear-gradient(180deg,#fff,#fbfaff)}
+.nav-card .section-title{color:#4c1d95;font-size:22px}
+.selected-hero{border:2px solid var(--purple);border-radius:18px;padding:18px;display:flex;align-items:center;justify-content:center;gap:22px;background:white;box-shadow:0 12px 25px rgba(91,32,214,.12);margin-bottom:16px}
+.selected-hero .app-icon{width:82px;height:82px;border-radius:20px;background:linear-gradient(135deg,#2e099e,#1d0882);display:grid;place-items:center;color:white;font-size:42px}
+.selected-hero .value{font-size:clamp(42px,9vw,68px);font-weight:950;letter-spacing:-.05em;color:#0b0f19}
+.selected-hero .badge{display:inline-flex;gap:8px;align-items:center;margin-top:8px;background:var(--purple);color:white;border-radius:10px;padding:7px 12px;font-weight:800}
+#navApp{position:absolute;left:-9999px}
+.nav-tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.nav-tile{min-height:112px;border:1px solid var(--line);background:white;color:#111827;border-radius:14px;padding:10px 8px;box-shadow:0 8px 18px rgba(15,23,42,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-weight:800}
+.nav-tile.active{outline:3px solid var(--purple);background:#f4efff}
+.nav-icon{font-size:34px}
+.hint{text-align:center;color:var(--muted);margin:12px 0 0}
+.dashboard{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.input-card{border-color:#bbf7d0;background:linear-gradient(180deg,#fff,#f3fff8)}
+.input-card .section-title{color:var(--green);font-size:20px}
+.route-card{border-color:#fed7aa;background:linear-gradient(180deg,#fff,#fffaf0)}
+.route-card .section-title{color:var(--orange);font-size:20px;justify-content:space-between}
+.quick-action{width:100%;border:1px solid #d7e7ff;background:white;color:#1f2937;border-radius:14px;padding:17px 16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;text-align:left;box-shadow:0 4px 12px rgba(15,23,42,.04)}
+.quick-action strong{display:block;color:#0969da;font-size:18px}.quick-action.import strong{color:var(--green)}.quick-action .circle{width:52px;height:52px;border-radius:999px;display:grid;place-items:center;background:#0969da;color:white;font-size:28px;flex:0 0 auto}.quick-action.import .circle{background:var(--green)}.quick-action .chev{margin-left:auto;font-size:34px;color:#4b5563}
+.route-summary{border:1px dashed #f59e0b;border-radius:16px;padding:18px;text-align:center;background:white;color:#374151}
+.route-summary strong{display:block;color:#111827;font-size:19px;margin:6px 0}
+.statusline{font-weight:800;color:#92400e}
+.actions-card{background:#fff;border-color:#ddd6fe}
+.primary-action,.share-action{width:100%;border-radius:12px;padding:18px 20px;text-align:left;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.primary-action{border:0;background:linear-gradient(135deg,var(--purple2),var(--purple));color:white;box-shadow:0 12px 25px rgba(91,32,214,.22)}
+.primary-action strong,.share-action strong{display:block;font-size:22px}.primary-action span,.share-action span{display:block;font-size:15px;opacity:.86;margin-top:3px}
+.share-action{background:white;color:#312e81;border:1px solid #c4b5fd}
+.single-point{display:none}
+.route{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.point{background:white;border:1px solid var(--line);border-radius:16px;display:grid;grid-template-columns:76px 1fr;overflow:hidden;box-shadow:0 6px 14px rgba(15,23,42,.05)}
+.point.day{border-color:#a78bfa}.point.shaping{opacity:.88}.point-panel{background:#f5f3ff;padding:12px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}.point.day .point-panel{background:#ede9fe}.kicker{font-size:11px;color:#6b7280}.number{font-size:24px;font-weight:900;color:#4c1d95}.emoji{font-size:18px}.point-main{padding:13px;display:flex;gap:10px;justify-content:space-between;align-items:center}.title{font-size:17px;font-weight:850}.meta,.coords{font-size:12px;color:#6b7280;margin-top:3px}.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.actions button{border:0;border-radius:10px;padding:9px 11px;background:var(--purple);color:white;font-weight:800}.actions button.secondary,.secondary{background:white;color:#4c1d95;border:1px solid #c4b5fd}
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.feature{background:white;border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}.feature b{display:block;margin:5px 0}.feature span{font-size:13px;color:#4b5563}
+details.example-info{background:white;border:1px solid #bfdbfe;border-radius:14px;padding:13px;margin-top:12px;color:#1f2937}details.example-info summary{font-weight:800;color:#0969da;cursor:pointer}pre{white-space:pre-wrap;overflow:auto}
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;align-items:flex-end;justify-content:center;z-index:50;padding:14px}.modal-backdrop.open{display:flex}.modal{background:white;color:#111827;border-radius:22px 22px 14px 14px;max-width:760px;width:100%;padding:16px;box-shadow:0 22px 70px rgba(0,0,0,.35)}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.modal-title{margin:0;font-size:24px}textarea{width:100%;min-height:230px;border:1px solid #d1d5db;border-radius:14px;padding:14px;margin:14px 0}.manual-actions{display:flex;gap:10px;flex-wrap:wrap}.manual-actions button, .import-launch button, .toolbar button, #loadDefaultBtn, #clearRouteBtn{border-radius:12px;padding:12px 14px;font-weight:800;border:1px solid #c4b5fd;background:white;color:#4c1d95}
+.toolbar,.import-launch{display:none}.smallnote{color:#6b7280;font-size:13px}.info-card{display:none}.controls{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);padding:10px calc(12px + env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;z-index:20}.controls button{flex:1;border:0;border-radius:12px;padding:13px 10px;background:var(--purple);color:white;font-weight:900}.controls .secondary{background:white;color:#4c1d95;border:1px solid #c4b5fd}
+footer{padding:18px;color:#4b5563;text-align:center;font-size:14px}
+@media(max-width:760px){main{padding:14px}.dashboard{grid-template-columns:1fr}.nav-tiles{grid-template-columns:repeat(3,1fr);overflow:visible}.selected-hero{gap:14px}.selected-hero .app-icon{width:68px;height:68px}.features{grid-template-columns:repeat(2,1fr)}.point{grid-template-columns:64px 1fr}.point-main{align-items:flex-start;flex-direction:column}.actions{width:100%;justify-content:stretch}.actions button{flex:1}.nav-card .section-title,.input-card .section-title,.route-card .section-title{font-size:18px}}
+@media(max-width:420px){.nav-tiles{display:flex;overflow-x:auto;padding-bottom:4px}.nav-tile{min-width:118px}.selected-hero .value{font-size:36px}.selected-hero{justify-content:flex-start}.features{grid-template-columns:1fr 1fr}h1{font-size:38px}.logo-mark{font-size:46px}}
+</style>
+</head>
+
+<body>
+  <div class="app">
+    <header>
+      <button class="gear" type="button" aria-label="Einstellungen">⚙</button>
+      <div class="hero">
+        <div class="logo-mark" aria-hidden="true">🧭</div>
+        <div>
+          <h1>Tour Navigator</h1>
+          <div class="subhead">Koordinaten → Navigation</div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="card nav-card">
+        <h2 class="section-title">➤ 1. Navi wählen</h2>
+        <div class="selected-hero" aria-live="polite">
+          <div id="selectedNavIcon" class="app-icon">🏔️</div>
+          <div>
+            <div id="selectedNavName" class="value">Kurviger</div>
+            <div class="badge">✓ AUSGEWÄHLT</div>
+          </div>
+        </div>
+        <select id="navApp" aria-label="Navigations-App">
+          <option value="kurviger" selected>Kurviger</option>
+          <option value="google">Google Maps</option>
+          <option value="apple">Apple Karten</option>
+          <option value="waze">Waze</option>
+        </select>
+        <div class="nav-tiles" aria-label="Navi-Auswahl">
+          <button class="nav-tile active" type="button" data-nav="kurviger"><span class="nav-icon">🏔️</span>Kurviger</button>
+          <button class="nav-tile" type="button" data-nav="google"><span class="nav-icon">📍</span>Google<br>Maps</button>
+          <button class="nav-tile" type="button" data-nav="apple"><span class="nav-icon">🗺️</span>Apple<br>Karten</button>
+          <button class="nav-tile" type="button" data-nav="waze"><span class="nav-icon">🚙</span>Waze</button>
+          <button class="nav-tile" type="button" data-nav="kurviger"><span class="nav-icon">🛣️</span>Route</button>
+        </div>
+        <p class="hint">Tippe auf ein Navi-Icon, um es zu wählen.</p>
+      </section>
+
+      <section class="dashboard">
+        <div class="card input-card">
+          <h2 class="section-title">✎ Koordinaten eingeben</h2>
+          <button id="examplesBtn" class="quick-action" type="button" onclick="document.getElementById('examplesDetails').open = !document.getElementById('examplesDetails').open">
+            <span class="circle">i</span><span><strong>Beispieleingaben</strong>Schnell starten mit fertigen Beispielen</span><span class="chev">›</span>
+          </button>
+          <button id="openTextImportBtn" class="quick-action import" type="button">
+            <span class="circle">↥</span><span><strong>Textliste importieren</strong>Eigene Koordinaten einfügen oder hochladen</span><span class="chev">›</span>
+          </button>
+          <details id="examplesDetails" class="example-info">
+            <summary>Beispiele anzeigen/verbergen</summary>
+            <pre>Aichwald
+Stuttgart, Deutschland
+48.78123, 9.38765, Eigener Punkt
+48,78123; 9,38765; Eigener Punkt
+N1 Hôtel Le Christania</pre>
+          </details>
+          <input id="gpxInput" type="file" accept=".gpx,application/gpx+xml,text/xml,application/xml" style="display:block;margin-top:12px;width:100%" />
+          <button id="loadDefaultBtn" type="button" style="margin-top:12px;width:100%">Route des Grandes Alpes laden</button>
+        </div>
+
+        <div class="card route-card">
+          <h2 class="section-title"><span>☷ Routenliste</span><span id="routeCount">0 Punkte</span></h2>
+          <div class="route-summary">
+            <div style="font-size:34px">📍</div>
+            <strong>Route des Grandes Alpes</strong>
+            <div id="statusline" class="statusline"></div>
+          </div>
+          <button id="clearRouteBtn" class="secondary" type="button" style="width:100%;margin-top:14px">🗑 Liste leeren</button>
+        </div>
+      </section>
+
+      <section class="card actions-card">
+        <button id="openKurvigerRouteBtn" class="primary-action" type="button"><span><strong>🚀 Route starten</strong><span>Route in Kurviger öffnen</span></span><b>›</b></button>
+        <button class="share-action" type="button" onclick="navigator.share ? navigator.share({title:'Tour Navigator', text: location.href}) : alert('Teilen ist in diesem Browser nicht verfügbar.')"><span><strong>🔗 Link / Datei teilen</strong><span>Route als Link oder Datei exportieren</span></span><b>›</b></button>
+      </section>
+
+      <section id="route" class="route"></section>
+      <p class="smallnote">Kurviger öffnet die Route mit mehreren Koordinaten-Wegpunkten. Waze, Google und Apple öffnen Einzelziele.</p>
+
+      <section class="features">
+        <div class="feature">🛡️<b>Datenschutz</b><span>100% lokal im Browser</span></div>
+        <div class="feature">⚡<b>Schnell & Einfach</b><span>Keine Installation</span></div>
+        <div class="feature">📱<b>Mobile optimiert</b><span>Perfekt fürs iPhone</span></div>
+        <div class="feature">💜<b>Made for Biker</b><span>Für deine Touren</span></div>
+      </section>
+
+      <div class="single-point">
+        <input id="singleName" type="text" />
+        <input id="singleLat" type="text" inputmode="decimal" />
+        <input id="singleLon" type="text" inputmode="decimal" />
+        <button id="addPointEndBtn">Wegpunkt anhängen</button>
+        <button id="addPointAfterBtn">Nach gewähltem N-Ziel</button>
+      </div>
+    </main>
+
+    <footer>© 2025 Tour Navigator · Made with ❤️ for Biker · v4.0</footer>
+  </div>
+
+  <div id="textImportModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="textImportTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="textImportTitle" class="modal-title">Textliste importieren</h2>
+        <button id="closeTextImportBtn" class="secondary modal-close" type="button" aria-label="Importfenster schließen">×</button>
+      </div>
+      <textarea id="manualText" placeholder="Eine Zeile = ein Routenpunkt&#10;Beispiel: 48,78123; 9,38765; Eigener Punkt"></textarea>
+      <div class="manual-actions">
+        <button id="importTextBtn" class="secondary" type="button">Import übernehmen</button>
+        <button id="clearTextBtn" class="secondary" type="button">Text löschen</button>
+        <button id="closeTextImportBtn2" type="button">Fertig</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prevDay" class="secondary">Vorheriges N-Ziel</button>
+    <button id="nextDay">Nächstes N-Ziel</button>
+  </div>
+
+<script>
+let points = [{"idx": 1, "name": "Aichschieß", "type": "start", "sym": "Flag, Green", "lat": 48.74844, "lon": 9.3961, "q": "Aichschieß", "day": null}, {"idx": 2, "name": "Hôtel Le Christania", "type": "via", "sym": "Flag, Blue", "lat": 46.2455, "lon": 6.50551, "q": "Hôtel Le Christania", "day": 1}, {"idx": 3, "name": "shaping point", "type": "shaping", "sym": "Waypoint", "lat": 46.23669, "lon": 6.65372, "q": "shaping point", "day": null}, {"idx": 4, "name": "Col de l'Encrenaz", "type": "shaping", "sym": "Waypoint", "lat": 46.17269, "lon": 6.63366, "q": "Col de l'Encrenaz", "day": null}, {"idx": 5, "name": "Col de la Colombière", "type": "shaping", "sym": "Waypoint", "lat": 45.99216, "lon": 6.47546, "q": "Col de la Colombière", "day": null}, {"idx": 6, "name": "Col des Aravis", "type": "shaping", "sym": "Waypoint", "lat": 45.87227, "lon": 6.46487, "q": "Col des Aravis", "day": null}, {"idx": 7, "name": "Cormet de Roselend (mit Col de Méraillet)", "type": "shaping", "sym": "Waypoint", "lat": 45.69133, "lon": 6.69062, "q": "Cormet de Roselend (mit Col de Méraillet)", "day": null}, {"idx": 8, "name": "Col de l’Iseran", "type": "shaping", "sym": "Waypoint", "lat": 45.41711, "lon": 7.03084, "q": "Col de l’Iseran", "day": null}, {"idx": 9, "name": "Bonneval sur Pont!", "type": "shaping", "sym": "Waypoint", "lat": 45.37109, "lon": 7.04706, "q": "Bonneval sur Pont!", "day": null}, {"idx": 10, "name": "N2 L'Outa Sa-So", "type": "via", "sym": "Flag, Blue", "lat": 45.2751, "lon": 6.81589, "q": "N2 L'Outa Sa-So", "day": 2}, {"idx": 11, "name": "Col du Télégraphe", "type": "shaping", "sym": "Waypoint", "lat": 45.20269, "lon": 6.44462, "q": "Col du Télégraphe", "day": null}, {"idx": 12, "name": "Col du Galibier", "type": "shaping", "sym": "Waypoint", "lat": 45.06414, "lon": 6.40785, "q": "Col du Galibier", "day": null}, {"idx": 13, "name": "N3 Hotel Vauban Briancon", "type": "via", "sym": "Flag, Blue", "lat": 44.89488, "lon": 6.63313, "q": "N3 Hotel Vauban Briancon", "day": 3}, {"idx": 14, "name": "Col d'Izoard", "type": "shaping", "sym": "Waypoint", "lat": 44.82, "lon": 6.73503, "q": "Col d'Izoard", "day": null}, {"idx": 15, "name": "Col de la Bonette mit Restefond", "type": "shaping", "sym": "Waypoint", "lat": 44.32662, "lon": 6.8075, "q": "Col de la Bonette mit Restefond", "day": null}, {"idx": 16, "name": "N4 Hostellerie de Rimplas", "type": "via", "sym": "Flag, Blue", "lat": 44.06412, "lon": 7.13064, "q": "N4 Hostellerie de Rimplas", "day": 4}, {"idx": 17, "name": "Col de Turini", "type": "shaping", "sym": "Waypoint", "lat": 43.97756, "lon": 7.3916, "q": "Col de Turini", "day": null}, {"idx": 18, "name": "Nizza Lympia alter Hafen", "type": "shaping", "sym": "Waypoint", "lat": 43.6961, "lon": 7.28593, "q": "Nizza Lympia alter Hafen", "day": null}, {"idx": 19, "name": "Nizza Hafen", "type": "shaping", "sym": "Waypoint", "lat": 43.69511, "lon": 7.27508, "q": "Nizza Hafen", "day": null}, {"idx": 20, "name": "Shaping Point 19", "type": "shaping", "sym": "Waypoint", "lat": 43.68581, "lon": 7.23677, "q": "Shaping Point 19", "day": null}, {"idx": 21, "name": "Shaping Point 20", "type": "shaping", "sym": "Waypoint", "lat": 43.81857, "lon": 6.58696, "q": "Shaping Point 20", "day": null}, {"idx": 22, "name": "N5 Annot Hotel", "type": "via", "sym": "Flag, Blue", "lat": 43.9661, "lon": 6.66759, "q": "N5 Annot Hotel", "day": 5}, {"idx": 23, "name": "Gorge de Dalouis", "type": "shaping", "sym": "Waypoint", "lat": 44.04551, "lon": 6.84202, "q": "Gorge de Dalouis", "day": null}, {"idx": 24, "name": "Col de la Cayolle", "type": "shaping", "sym": "Waypoint", "lat": 44.25908, "lon": 6.74401, "q": "Col de la Cayolle", "day": null}, {"idx": 25, "name": "Route de Sigouret", "type": "shaping", "sym": "Waypoint", "lat": 44.62044, "lon": 6.54878, "q": "Route de Sigouret", "day": null}, {"idx": 26, "name": "N6 Hotel Christiana - la salle des alpes", "type": "via", "sym": "Flag, Blue", "lat": 44.94484, "lon": 6.56266, "q": "N6 Hotel Christiana - la salle des alpes", "day": 6}, {"idx": 27, "name": "Alpe d'Huez", "type": "shaping", "sym": "Waypoint", "lat": 45.09298, "lon": 6.07177, "q": "Alpe d'Huez", "day": null}, {"idx": 28, "name": "Col du Glandon", "type": "shaping", "sym": "Waypoint", "lat": 45.23959, "lon": 6.17554, "q": "Col du Glandon", "day": null}, {"idx": 29, "name": "Col du Mollard", "type": "shaping", "sym": "Waypoint", "lat": 45.21047, "lon": 6.33714, "q": "Col du Mollard", "day": null}, {"idx": 30, "name": "Col de la Madeleine", "type": "shaping", "sym": "Waypoint", "lat": 45.43494, "lon": 6.37551, "q": "Col de la Madeleine", "day": null}, {"idx": 31, "name": "Ab hier optional nach Courchevel", "type": "shaping", "sym": "Waypoint", "lat": 45.52186, "lon": 6.48416, "q": "Ab hier optional nach Courchevel", "day": null}, {"idx": 32, "name": "Pilatus Airport Courchevel", "type": "via", "sym": "Flag, Blue", "lat": 45.39641, "lon": 6.6324, "q": "Pilatus Airport Courchevel", "day": null}, {"idx": 33, "name": "N7 Radiana la Léchère", "type": "via", "sym": "Flag, Blue", "lat": 45.51717, "lon": 6.48242, "q": "N7 Radiana la Léchère", "day": 7}, {"idx": 34, "name": "Chamonix Alpen Coaster", "type": "shaping", "sym": "Waypoint", "lat": 45.92477, "lon": 6.87954, "q": "Chamonix Alpen Coaster", "day": null}, {"idx": 35, "name": "Shaping Point 34", "type": "shaping", "sym": "Waypoint", "lat": 46.31244, "lon": 6.94669, "q": "Shaping Point 34", "day": null}, {"idx": 36, "name": "T8 Agora Swiss night", "type": "via", "sym": "Flag, Blue", "lat": 46.51532, "lon": 6.6277, "q": "T8 Agora Swiss night", "day": 8}, {"idx": 37, "name": "Musee de l'aviation", "type": "via", "sym": "Flag, Blue", "lat": 46.84613, "lon": 6.91674, "q": "Musee de l'aviation", "day": null}, {"idx": 38, "name": "Shaping Point 37", "type": "shaping", "sym": "Waypoint", "lat": 48.74708, "lon": 9.39198, "q": "Shaping Point 37", "day": null}, {"idx": 39, "name": "Destination", "type": "destination", "sym": "Flag, Red", "lat": 46.83361, "lon": 6.61358, "q": "Destination", "day": null}];
+const defaultRoute = JSON.parse(JSON.stringify(points));
+let currentDayIndex = 0;
+let lastImportKind = "Route des Grandes Alpes · Standardroute";
+
+function enc(s) { return encodeURIComponent(String(s || "")); }
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+function isRealNumber(v) {
+  return typeof v === "number" && Number.isFinite(v);
+}
+function isValidLatLon(lat, lon) {
+  return isRealNumber(lat) && isRealNumber(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
+}
+function hasCoords(p) {
+  return isValidLatLon(p.lat, p.lon);
+}
+function coordString(p) {
+  return `${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
+}
+function textDestination(p) {
+  return String(p.q || p.name || "").trim();
+}
+function navAppLabel(value) {
+  return ({kurviger:"Kurviger", waze:"Waze", google:"Google Maps", apple:"Apple Karten"})[value] || value || "Navi";
+}
+function updateSelectedNav() {
+  const sel = document.getElementById("navApp");
+  const out = document.getElementById("selectedNavName");
+  if (sel && out) out.textContent = navAppLabel(sel.value);
+}
+function kurvigerRoutePoints(targetIndex = null) {
+  const candidates = points
+    .map((p, i) => ({p, i, day: p.day || inferDay(p.name, p.type, i)}))
+    .filter(x => hasCoords(x.p));
+
+  if (!candidates.length) return [];
+
+  if (targetIndex !== null && Number.isFinite(targetIndex)) {
+    const target = points[targetIndex];
+    const targetDay = target ? (target.day || inferDay(target.name, target.type, targetIndex)) : null;
+    if (targetDay) {
+      const ids = points.map((p,i) => ({day: p.day || inferDay(p.name,p.type,i), i})).filter(x => x.day);
+      const dayPos = ids.findIndex(x => x.day === targetDay);
+      const start = dayPos > 0 ? ids[dayPos - 1].i : 0;
+      const end = targetIndex;
+      const segment = points.slice(start, end + 1).filter(hasCoords);
+      if (segment.length >= 2) return segment;
+    }
+    return points.slice(0, targetIndex + 1).filter(hasCoords);
+  }
+
+  const ids = points.map((p,i) => ({day: p.day || inferDay(p.name,p.type,i), i})).filter(x => x.day);
+  if (ids.length && ids[currentDayIndex]) {
+    const dayTarget = ids[currentDayIndex];
+    const dayPos = ids.findIndex(x => x.day === dayTarget.day);
+    const start = dayPos > 0 ? ids[dayPos - 1].i : 0;
+    const segment = points.slice(start, dayTarget.i + 1).filter(hasCoords);
+    if (segment.length >= 2) return segment;
+  }
+
+  return candidates.map(x => x.p);
+}
+function kurvigerRouteUrl(targetIndex = null) {
+  let routePoints = kurvigerRoutePoints(targetIndex);
+  if (routePoints.length > 25) {
+    const keep = [];
+    const step = (routePoints.length - 1) / 24;
+    for (let i = 0; i < 25; i++) keep.push(routePoints[Math.round(i * step)]);
+    routePoints = keep;
+  }
+  if (routePoints.length < 2) return null;
+  const params = routePoints
+    .map(p => `point=${enc(coordString(p))}`)
+    .join("&");
+  return `https://kurviger.de/de?${params}`;
+}
+function openKurvigerRoute(targetIndex = null) {
+  const url = kurvigerRouteUrl(targetIndex);
+  if (!url) {
+    alert("Für eine Kurviger-Route brauche ich mindestens zwei gültige Koordinatenpunkte.");
+    return;
+  }
+  window.location.href = url;
+}
+function inferDay(name, typ, indexZero) {
+  const n = String(name || "");
+  const m = n.match(/^\s*N\s*([1-8])\b/i);
+  if (m) return Number(m[1]);
+  if (/^\s*T\s*8\b/i.test(n)) return 8;
+  if ((typ === "via" || typ === "routepoint") && indexZero === 1 && /christania/i.test(n)) return 1;
+  return null;
+}
+function cleanName(name) {
+  return String(name || "Unbenannter Punkt").replace(/^\s*N\s*([1-8])\s*/i, "").replace(/^\s*T\s*8\s*/i, "").trim();
+}
+function roleLabel(p, day) {
+  if (day) return "Tagesziel";
+  if (p.type === "start") return "Start";
+  if (p.type === "destination") return "Ziel";
+  if (p.type === "wpt") return "Wegpunkt";
+  if (p.type === "trkpt") return "Trackpunkt";
+  if (p.type === "via") return "Zwischenziel";
+  if (p.type === "manual") return "Manuell";
+  if (p.type === "text") return "Text";
+  return "Shaping Point";
+}
+function emojiFor(p, day) {
+  if (day) return "🏁";
+  if (p.type === "start") return "▶";
+  if (p.type === "destination") return "■";
+  if (p.type === "via" || p.type === "wpt") return "◆";
+  if (p.type === "trkpt") return "·";
+  if (p.type === "manual" || p.type === "text") return "＋";
+  return "•";
+}
+function navUrl(p) {
+  const app = document.getElementById("navApp").value;
+  const label = textDestination(p);
+  const has = hasCoords(p);
+  const dest = has ? coordString(p) : label;
+
+  if (!dest) {
+    alert("Dieser Punkt hat weder Koordinaten noch Namen.");
+    return null;
+  }
+
+  if (app === "waze") {
+    return has
+      ? `https://waze.com/ul?ll=${enc(dest)}&navigate=yes`
+      : `https://waze.com/ul?q=${enc(label)}&navigate=yes`;
+  }
+  if (app === "google") {
+    return `https://www.google.com/maps/dir/?api=1&destination=${enc(dest)}&travelmode=driving`;
+  }
+  if (app === "apple") {
+    return `http://maps.apple.com/?daddr=${enc(dest)}&dirflg=d`;
+  }
+  return has
+    ? `https://kurviger.de/de?point=${enc(dest)}&name=${enc(label || dest)}`
+    : `https://kurviger.de/de?query=${enc(label)}`;
+}
+function openNav(idx) {
+  const p = points[idx];
+  if (!p) return;
+  if (document.getElementById("navApp").value === "kurviger") {
+    const routeUrl = kurvigerRouteUrl(idx);
+    if (routeUrl) {
+      window.location.href = routeUrl;
+      return;
+    }
+  }
+  const url = navUrl(p);
+  if (url) window.location.href = url;
+}
+function openMap(idx) {
+  const p = points[idx];
+  if (!p) return;
+  const q = hasCoords(p) ? coordString(p) : textDestination(p);
+  if (!q) {
+    alert("Dieser Punkt hat weder Koordinaten noch Namen.");
+    return;
+  }
+  window.location.href = `https://www.google.com/maps/search/?api=1&query=${enc(q)}`;
+}
+function render() {
+  const route = document.getElementById("route");
+  route.innerHTML = "";
+  points.forEach((p, i) => {
+    const day = p.day || inferDay(p.name, p.type, i);
+    p.day = day;
+    const isShaping = (p.type === "shaping" || p.type === "trkpt") && !day;
+    const cls = ["point", day ? "day" : "", isShaping ? "shaping" : "", p.type === "start" ? "start" : "", p.type === "destination" ? "destination" : ""].join(" ");
+    const el = document.createElement("article");
+    el.className = cls;
+    if (day) el.id = `day-${day}`;
+    const shownNumber = day ? `N${day}` : String(p.idx || i + 1).padStart(2, "0");
+    const title = day ? cleanName(p.name) : (p.name || `Punkt ${i+1}`);
+    el.innerHTML = `
+      <div class="point-panel">
+        <span class="kicker">${roleLabel(p, day)}</span>
+        <span class="number">${shownNumber}</span>
+        <span class="emoji">${emojiFor(p, day)}</span>
+      </div>
+      <div class="point-main">
+        <div>
+          <div class="title">${escapeHtml(title)}</div>
+          <div class="meta">${escapeHtml(p.type || "routepoint")} · GPX-Punkt ${escapeHtml(p.idx || i+1)}</div>
+          <div class="coords">${hasCoords(p) ? `${p.lat.toFixed(5)}, ${p.lon.toFixed(5)}` : "Suche über Ortsname / Text"}</div>
+        </div>
+        <div class="actions">
+          <button onclick="openNav(${i})">Navigieren</button>
+          <button class="secondary" onclick="openMap(${i})">Karte</button>
+        </div>
+      </div>`;
+    route.appendChild(el);
+  });
+  document.getElementById("statusline").textContent = `${points.length} Punkte geladen · Quelle: ${lastImportKind}`;
+}
+function dayIds() {
+  return points.map((p,i) => ({day: p.day || inferDay(p.name,p.type,i), i})).filter(x => x.day).map(x => x.day);
+}
+function scrollDay(direction) {
+  const ids = dayIds();
+  if (!ids.length) { window.scrollBy({top: direction * 420, behavior: "smooth"}); return; }
+  currentDayIndex = Math.max(0, Math.min(ids.length - 1, currentDayIndex + direction));
+  document.getElementById(`day-${ids[currentDayIndex]}`)?.scrollIntoView({behavior:"smooth", block:"center"});
+}
+function renumberPoints() {
+  points.forEach((p, i) => p.idx = i + 1);
+}
+function normalizeDecimal(s) {
+  return String(s || "").trim().replace(",", ".");
+}
+function makeManualPoint(name, lat, lon, type="manual") {
+  const label = String(name || "").trim();
+  const hasValidCoords = isValidLatLon(lat, lon);
+  return {
+    idx: points.length + 1,
+    name: label || `Wegpunkt ${points.length + 1}`,
+    type,
+    sym: "",
+    lat: hasValidCoords ? lat : null,
+    lon: hasValidCoords ? lon : null,
+    q: label || "",
+    day: inferDay(label, type, points.length)
+  };
+}
+function readSinglePoint() {
+  const name = document.getElementById("singleName").value.trim();
+  const latRaw = normalizeDecimal(document.getElementById("singleLat").value);
+  const lonRaw = normalizeDecimal(document.getElementById("singleLon").value);
+
+  let lat = null, lon = null;
+  const hasLatLonText = latRaw !== "" || lonRaw !== "";
+
+  if (hasLatLonText) {
+    lat = parseFloat(latRaw);
+    lon = parseFloat(lonRaw);
+    if (!isValidLatLon(lat, lon)) {
+      alert("Koordinaten bitte vollständig und gültig eingeben, z. B. 48.78123 und 9.38765.");
+      return null;
+    }
+  }
+
+  if (!name && !hasLatLonText) {
+    alert("Bitte Name/Adresse eingeben oder Koordinaten ausfüllen.");
+    return null;
+  }
+  return makeManualPoint(name || `Wegpunkt ${points.length + 1}`, lat, lon, "manual");
+}
+function clearSingleInputs() {
+  document.getElementById("singleName").value = "";
+  document.getElementById("singleLat").value = "";
+  document.getElementById("singleLon").value = "";
+}
+function selectedDayInsertIndex() {
+  const ids = dayIds();
+  if (!ids.length) return points.length;
+  const wanted = ids[currentDayIndex] || ids[0];
+  const idx = points.findIndex((p, i) => (p.day || inferDay(p.name, p.type, i)) === wanted);
+  return idx >= 0 ? idx + 1 : points.length;
+}
+function parseTextList(txt) {
+  return String(txt || "")
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(line => line && !line.startsWith("#"))
+    .map((line, i) => parseTextLine(line, i));
+}
+function buildTextPoint(i, name, lat = null, lon = null) {
+  return {
+    idx: i + 1,
+    name,
+    type: "text",
+    sym: "",
+    lat: isValidLatLon(lat, lon) ? lat : null,
+    lon: isValidLatLon(lat, lon) ? lon : null,
+    q: name,
+    day: inferDay(name, "text", i)
+  };
+}
+function parseTextLine(line, i) {
+  const pipe = line.split("|").map(s => s.trim());
+  if (pipe.length >= 3) {
+    const lat = parseFloat(normalizeDecimal(pipe[1]));
+    const lon = parseFloat(normalizeDecimal(pipe[2]));
+    if (isValidLatLon(lat, lon)) {
+      return buildTextPoint(i, pipe[0] || `Punkt ${i+1}`, lat, lon);
+    }
+  }
+
+  const semicolonParts = line.split(";").map(s => s.trim());
+  if (semicolonParts.length >= 2) {
+    const lat = parseFloat(normalizeDecimal(semicolonParts[0]));
+    const lon = parseFloat(normalizeDecimal(semicolonParts[1]));
+    if (isValidLatLon(lat, lon)) {
+      const name = semicolonParts.slice(2).join("; ") || `Punkt ${i+1}`;
+      return buildTextPoint(i, name, lat, lon);
+    }
+  }
+
+  const commaParts = line.split(",").map(s => s.trim());
+  if (commaParts.length >= 2) {
+    const lat = parseFloat(normalizeDecimal(commaParts[0]));
+    const lon = parseFloat(normalizeDecimal(commaParts[1]));
+    if (isValidLatLon(lat, lon)) {
+      const name = commaParts.slice(2).join(", ") || `Punkt ${i+1}`;
+      return buildTextPoint(i, name, lat, lon);
+    }
+  }
+
+  return buildTextPoint(i, line);
+}
+function parseGpxRobust(txt) {
+  const xml = new DOMParser().parseFromString(txt, "application/xml");
+  if (xml.getElementsByTagName("parsererror").length) return {points: [], kind: "XML-Fehler"};
+
+  const all = Array.from(xml.getElementsByTagName("*"));
+  const byName = tag => all.filter(n => n.localName === tag);
+  const getText = (node, tag) => {
+    const child = Array.from(node.children).find(c => c.localName === tag);
+    return child && child.textContent ? child.textContent.trim() : "";
+  };
+  const makePoint = (node, i, fallbackType) => {
+    const lat = parseFloat(node.getAttribute("lat"));
+    const lon = parseFloat(node.getAttribute("lon"));
+    const name = getText(node, "name") || `${fallbackType === "trkpt" ? "Trackpunkt" : fallbackType === "wpt" ? "Wegpunkt" : "Routepunkt"} ${i+1}`;
+    const typ = getText(node, "type") || fallbackType;
+    return {idx:i+1, name, type:typ, sym:getText(node,"sym"), lat, lon, q:name, day:inferDay(name,typ,i)};
+  };
+  const valid = p => isValidLatLon(p.lat, p.lon);
+
+  let nodes = byName("rtept");
+  if (nodes.length) return {points: nodes.map((n,i) => makePoint(n,i,"routepoint")).filter(valid), kind: "Routepunkte"};
+
+  nodes = byName("wpt");
+  if (nodes.length) return {points: nodes.map((n,i) => makePoint(n,i,"wpt")).filter(valid), kind: "Wegpunkte"};
+
+  nodes = byName("trkpt");
+  if (nodes.length) {
+    const maxPoints = 40;
+    const step = Math.max(1, Math.ceil(nodes.length / maxPoints));
+    let picked = nodes.filter((_, i) => i % step === 0);
+    if (picked[picked.length - 1] !== nodes[nodes.length - 1]) picked.push(nodes[nodes.length - 1]);
+    return {points: picked.map((n,i) => makePoint(n,i,"trkpt")).filter(valid), kind: `Trackpunkte, ausgedünnt aus ${nodes.length} Punkten`};
+  }
+  return {points: [], kind: "unbekannt"};
+}
+
+document.getElementById("navApp").addEventListener("change", updateSelectedNav);
+document.getElementById("openKurvigerRouteBtn").addEventListener("click", () => openKurvigerRoute());
+document.getElementById("prevDay").addEventListener("click", () => scrollDay(-1));
+document.getElementById("nextDay").addEventListener("click", () => scrollDay(1));
+
+const textImportModal = document.getElementById("textImportModal");
+function openTextImportModal() {
+  textImportModal?.classList.add("open");
+  document.getElementById("manualText")?.focus();
+}
+function closeTextImportModal() {
+  textImportModal?.classList.remove("open");
+}
+document.getElementById("openTextImportBtn").addEventListener("click", openTextImportModal);
+document.getElementById("closeTextImportBtn").addEventListener("click", closeTextImportModal);
+document.getElementById("closeTextImportBtn2").addEventListener("click", closeTextImportModal);
+textImportModal?.addEventListener("click", (e) => {
+  if (e.target === textImportModal) closeTextImportModal();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && textImportModal?.classList.contains("open")) closeTextImportModal();
+});
+document.getElementById("loadDefaultBtn").addEventListener("click", () => {
+  points = JSON.parse(JSON.stringify(defaultRoute));
+  lastImportKind = "Route des Grandes Alpes · Standardroute";
+  currentDayIndex = 0;
+  document.getElementById("manualText").value = "";
+  document.getElementById("gpxInput").value = "";
+  render();
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+document.getElementById("clearTextBtn").addEventListener("click", () => {
+  document.getElementById("manualText").value = "";
+});
+document.getElementById("importTextBtn").addEventListener("click", () => {
+  const parsed = parseTextList(document.getElementById("manualText").value);
+  if (!parsed.length) {
+    alert("Keine Textpunkte gefunden. Bitte eine Zeile pro Ziel eingeben.");
+    return;
+  }
+  points = parsed;
+  lastImportKind = "Textliste";
+  currentDayIndex = 0;
+  render();
+  closeTextImportModal();
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+document.getElementById("addPointEndBtn").addEventListener("click", () => {
+  const p = readSinglePoint();
+  if (!p) return;
+  points.push(p);
+  renumberPoints();
+  lastImportKind = "Manuell ergänzt";
+  clearSingleInputs();
+  render();
+  document.querySelector("#route article:last-child")?.scrollIntoView({behavior:"smooth", block:"center"});
+});
+document.getElementById("addPointAfterBtn").addEventListener("click", () => {
+  const p = readSinglePoint();
+  if (!p) return;
+  const insertAt = selectedDayInsertIndex();
+  points.splice(insertAt, 0, p);
+  renumberPoints();
+  lastImportKind = "Manuell ergänzt";
+  clearSingleInputs();
+  render();
+  document.querySelectorAll("#route article")[insertAt]?.scrollIntoView({behavior:"smooth", block:"center"});
+});
+document.getElementById("clearRouteBtn").addEventListener("click", () => {
+  if (!confirm("Aktuelle Tour wirklich leeren? Die Standardroute bleibt über „Standardroute laden“ abrufbar.")) return;
+  points = [];
+  lastImportKind = "Leere manuelle Tour";
+  currentDayIndex = 0;
+  render();
+});
+document.getElementById("gpxInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const txt = await file.text();
+    const result = parseGpxRobust(txt);
+    if (!result.points.length) {
+      alert("Ich konnte keine GPX-Punkte erkennen.");
+      return;
+    }
+    points = result.points;
+    lastImportKind = result.kind;
+    currentDayIndex = 0;
+    render();
+    window.scrollTo({top:0, behavior:"smooth"});
+  } catch (err) {
+    alert("GPX konnte nicht gelesen werden: " + (err && err.message ? err.message : err));
+  }
+});
+
+
+const navMeta = {
+  kurviger: {label:"Kurviger", icon:"🏔️"},
+  google: {label:"Google Maps", icon:"📍"},
+  apple: {label:"Apple Karten", icon:"🗺️"},
+  waze: {label:"Waze", icon:"🚙"}
+};
+const originalUpdateSelectedNav = updateSelectedNav;
+updateSelectedNav = function() {
+  originalUpdateSelectedNav();
+  const val = document.getElementById("navApp")?.value || "kurviger";
+  const meta = navMeta[val] || navMeta.kurviger;
+  const icon = document.getElementById("selectedNavIcon");
+  const name = document.getElementById("selectedNavName");
+  if (icon) icon.textContent = meta.icon;
+  if (name) name.textContent = meta.label;
+  document.querySelectorAll(".nav-tile").forEach(btn => btn.classList.toggle("active", btn.dataset.nav === val));
+};
+document.querySelectorAll(".nav-tile").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const sel = document.getElementById("navApp");
+    sel.value = btn.dataset.nav;
+    sel.dispatchEvent(new Event("change", {bubbles:true}));
+    updateSelectedNav();
+  });
+});
+const originalRender = render;
+render = function() {
+  originalRender();
+  const rc = document.getElementById("routeCount");
+  if (rc) rc.textContent = `${points.length} Punkte`;
+};
+
+updateSelectedNav();
+render();
+</script>
+</body>
+</html>
