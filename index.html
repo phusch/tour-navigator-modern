@@ -141,6 +141,7 @@ N1 Hôtel Le Christania</pre>
 
       <section class="card actions-card">
         <button id="openKurvigerRouteBtn" class="primary-action" type="button"><span><strong>🚀 Route starten</strong><span>Route in Kurviger öffnen</span></span><b>›</b></button>
+        <button id="openTourAnimatorBtn" class="share-action" type="button"><span><strong>🎬 Tour animieren</strong><span>Aktuelle Route direkt an Tour Animator übergeben</span></span><b>›</b></button>
         <button class="share-action" type="button" onclick="navigator.share ? navigator.share({title:'Tour Navigator', text: location.href}) : alert('Teilen ist in diesem Browser nicht verfügbar.')"><span><strong>🔗 Link / Datei teilen</strong><span>Route als Link oder Datei exportieren</span></span><b>›</b></button>
       </section>
 
@@ -663,6 +664,40 @@ render = function() {
   const rc = document.getElementById("routeCount");
   if (rc) rc.textContent = `${points.length} Punkte`;
 };
+
+
+function openTourAnimator() {
+  const validPoints = (Array.isArray(points) ? points : [])
+    .filter(p => Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lon)))
+    .map(p => ({
+      name: String(p.name || p.q || ""),
+      type: String(p.type || ""),
+      lat: Number(p.lat),
+      lon: Number(p.lon)
+    }));
+
+  if (validPoints.length < 2) {
+    alert("Für eine Animation brauche ich mindestens zwei gültige Koordinatenpunkte.");
+    return;
+  }
+
+  const routeTitle =
+    document.querySelector(".route-summary strong")?.textContent?.trim()
+    || "Tour Navigator Route";
+
+  localStorage.setItem("tourNavigator.animationRoute", JSON.stringify({
+    title: routeTitle,
+    source: "tour-navigator-modern",
+    geometryMode: "road",
+    exportedAt: new Date().toISOString(),
+    points: validPoints
+  }));
+
+  window.location.href = "https://phusch.github.io/tour-animator/";
+}
+
+document.getElementById("openTourAnimatorBtn")
+  ?.addEventListener("click", openTourAnimator);
 
 updateSelectedNav();
 render();
