@@ -1,12 +1,14 @@
-Tour Navigator Animator V4.0.1
+Tour Navigator Modern V4.1.0
 
-Änderung gegenüber der hochgeladenen Basis:
-- neuer Button '🎬 Tour animieren' im Aktionsbereich
-- Übergabe der aktuellen points-Liste via localStorage an
-  https://phusch.github.io/tour-animator/
+Basis: hochgeladene tour-navigator-modern(1).zip
 
-Unverändert:
-- bestehende Routenlogik
-- GPX-Import
-- Kurviger / Google Maps / Apple Karten / Waze
-- bestehendes Layout und übrige Funktionen
+Neu aus der Original-Tourplanung übernommen/adaptiert:
+- Zahnrad öffnet Tourverwaltung
+- Tourname bearbeiten
+- neue Wegpunkte anhängen oder nach aktuellem Tagesziel einfügen
+- Tourpunkte umbenennen, Koordinaten bearbeiten, N-Tagesziel setzen, löschen
+- lokale Speicherung / letzte Route laden
+- JSON-Sicherung exportieren/importieren
+- Animator-Übergabe enthält nun day/idx/sym und aktuellen Tournamen
+
+Unverändert: moderne Hauptansicht, Navigation, GPX/Textimport, Kurviger, Kartenlinks und Animator-Button.

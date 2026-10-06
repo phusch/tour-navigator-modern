@@ -65,13 +65,30 @@ details.example-info{background:white;border:1px solid #bfdbfe;border-radius:14p
 footer{padding:18px;color:#4b5563;text-align:center;font-size:14px}
 @media(max-width:760px){main{padding:14px}.dashboard{grid-template-columns:1fr}.nav-tiles{grid-template-columns:repeat(3,1fr);overflow:visible}.selected-hero{gap:14px}.selected-hero .app-icon{width:68px;height:68px}.features{grid-template-columns:repeat(2,1fr)}.point{grid-template-columns:64px 1fr}.point-main{align-items:flex-start;flex-direction:column}.actions{width:100%;justify-content:stretch}.actions button{flex:1}.nav-card .section-title,.input-card .section-title,.route-card .section-title{font-size:18px}}
 @media(max-width:420px){.nav-tiles{display:flex;overflow-x:auto;padding-bottom:4px}.nav-tile{min-width:118px}.selected-hero .value{font-size:36px}.selected-hero{justify-content:flex-start}.features{grid-template-columns:1fr 1fr}h1{font-size:38px}.logo-mark{font-size:46px}}
+
+
+/* V4.1.0 – Tourverwaltung über Zahnrad */
+.gear{cursor:pointer;transition:transform .18s ease,background .18s ease}.gear:hover{transform:rotate(18deg);background:rgba(255,255,255,.20)}
+.settings-modal{max-width:980px;max-height:90vh;overflow:auto;border-radius:22px 22px 14px 14px;padding:18px;background:#f8fafc}
+.settings-intro{margin:3px 0 14px;color:#64748b;font-size:13px;line-height:1.45}
+.manage-grid{display:grid;gap:14px}
+.manage-section{border:1px solid #dbe5f0;background:#fff;border-radius:18px;padding:15px;box-shadow:0 8px 20px rgba(15,23,42,.06)}
+.manage-section h3{margin:0 0 10px;color:#1f2937;font-size:18px}.manage-section p{margin:5px 0 12px;color:#64748b;font-size:13px;line-height:1.45}
+.manage-title-row{display:grid;grid-template-columns:1fr auto;gap:9px}.manage-section input,.manage-section select{width:100%;border:1px solid #cbd5e1;background:#fff;color:#111827;border-radius:12px;padding:12px;font:inherit}
+.manage-actions{display:flex;flex-wrap:wrap;gap:8px}.manage-actions button{border-radius:11px;padding:11px 13px;font-weight:800;border:1px solid #c4b5fd;background:#fff;color:#4c1d95}.manage-actions button.primary{background:linear-gradient(135deg,var(--purple2),var(--purple));color:#fff;border:0}.manage-actions button.danger{background:#fff1f2;color:#b91c1c;border-color:#fecdd3}
+.settings-modal .single-point{display:block}.settings-modal .single-point-row{display:grid;grid-template-columns:1.5fr .75fr .75fr;gap:8px;margin-bottom:9px}.settings-modal .single-point input{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:12px}
+.storage-status{margin-top:9px;color:#64748b;font-size:12px;line-height:1.45}
+.point-edit-list{display:grid;gap:8px;max-height:42vh;overflow:auto;padding-right:3px}.point-edit-row{display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:9px;align-items:center;padding:9px;border:1px solid #e2e8f0;border-radius:13px;background:#f8fafc}.point-edit-row.day-target{border-color:#c4b5fd;background:#f5f3ff}.point-edit-index{display:grid;place-items:center;min-height:44px;border-radius:10px;background:#ede9fe;color:#4c1d95;font-weight:900}.point-edit-name{font-weight:850;color:#1f2937;overflow-wrap:anywhere}.point-edit-meta{margin-top:3px;color:#64748b;font-size:11px}.point-edit-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}.point-edit-actions button{border:0;border-radius:9px;padding:8px 9px;font-weight:800;background:#6d28d9;color:#fff}.point-edit-actions button.secondary{background:#fff;color:#4c1d95;border:1px solid #c4b5fd}.point-edit-actions button.danger{background:#fff1f2;color:#b91c1c;border:1px solid #fecdd3}
+.editor-grid{display:grid;gap:11px}.editor-field{display:grid;gap:5px}.editor-label{font-size:11px;font-weight:900;color:#475569;text-transform:uppercase;letter-spacing:.06em}.editor-row{display:grid;grid-template-columns:1.2fr .8fr;gap:9px}.editor-coords{display:grid;grid-template-columns:1fr 1fr;gap:9px}.editor-note{color:#64748b;font-size:12px;line-height:1.45}.modal input,.modal select{border:1px solid #cbd5e1;border-radius:12px;padding:12px;font:inherit}
+@media(max-width:680px){.settings-modal{max-height:92vh}.manage-title-row,.settings-modal .single-point-row,.editor-row,.editor-coords{grid-template-columns:1fr}.point-edit-row{grid-template-columns:46px minmax(0,1fr)}.point-edit-actions{grid-column:1/-1;justify-content:stretch}.point-edit-actions button{flex:1}}
+
 </style>
 </head>
 
 <body>
   <div class="app">
     <header>
-      <button class="gear" type="button" aria-label="Einstellungen">⚙</button>
+      <button id="settingsBtn" class="gear" type="button" aria-label="Tourverwaltung öffnen" title="Tourverwaltung">⚙</button>
       <div class="hero">
         <div class="logo-mark" aria-hidden="true">🧭</div>
         <div>
@@ -132,7 +149,7 @@ N1 Hôtel Le Christania</pre>
           <h2 class="section-title"><span>☷ Routenliste</span><span id="routeCount">0 Punkte</span></h2>
           <div class="route-summary">
             <div style="font-size:34px">📍</div>
-            <strong>Route des Grandes Alpes</strong>
+            <strong id="routeTitleDisplay">Route des Grandes Alpes</strong>
             <div id="statusline" class="statusline"></div>
           </div>
           <button id="clearRouteBtn" class="secondary" type="button" style="width:100%;margin-top:14px">🗑 Liste leeren</button>
@@ -154,17 +171,9 @@ N1 Hôtel Le Christania</pre>
         <div class="feature">📱<b>Mobile optimiert</b><span>Perfekt fürs iPhone</span></div>
         <div class="feature">💜<b>Made for Biker</b><span>Für deine Touren</span></div>
       </section>
+</main>
 
-      <div class="single-point">
-        <input id="singleName" type="text" />
-        <input id="singleLat" type="text" inputmode="decimal" />
-        <input id="singleLon" type="text" inputmode="decimal" />
-        <button id="addPointEndBtn">Wegpunkt anhängen</button>
-        <button id="addPointAfterBtn">Nach gewähltem N-Ziel</button>
-      </div>
-    </main>
-
-    <footer>© 2025 Tour Navigator · Made with ❤️ for Biker · v4.0</footer>
+    <footer>© 2025 Tour Navigator · Made with ❤️ for Biker · v4.1.0</footer>
   </div>
 
   <div id="textImportModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="textImportTitle">
@@ -182,6 +191,107 @@ N1 Hôtel Le Christania</pre>
     </div>
   </div>
 
+
+  <div id="settingsModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal settings-modal">
+      <div class="modal-head">
+        <div>
+          <h2 id="settingsTitle" class="modal-title">⚙ Tourverwaltung</h2>
+          <div class="settings-intro">Die moderne Fahransicht bleibt unverändert. Hier bearbeitest und sicherst du die Tour.</div>
+        </div>
+        <button id="closeSettingsBtn" class="secondary modal-close" type="button" aria-label="Tourverwaltung schließen">×</button>
+      </div>
+
+      <div class="manage-grid">
+        <section class="manage-section">
+          <h3>Tourname</h3>
+          <div class="manage-title-row">
+            <input id="tourTitleInput" type="text" value="Route des Grandes Alpes" aria-label="Tourname bearbeiten" />
+            <button id="saveTourTitleBtn" class="primary" type="button">Übernehmen</button>
+          </div>
+        </section>
+
+        <section class="manage-section">
+          <h3>Wegpunkt ergänzen</h3>
+          <p>Name/Adresse genügt. Koordinaten sind optional. Mit „Nach aktuellem N-Ziel“ wird hinter dem gerade angewählten Tagesziel eingefügt.</p>
+          <div class="single-point">
+            <div class="single-point-row">
+              <input id="singleName" type="text" placeholder="Name oder Adresse" />
+              <input id="singleLat" type="text" inputmode="decimal" placeholder="Breite optional" />
+              <input id="singleLon" type="text" inputmode="decimal" placeholder="Länge optional" />
+            </div>
+            <div class="manage-actions">
+              <button id="addPointEndBtn" class="primary" type="button">Wegpunkt anhängen</button>
+              <button id="addPointAfterBtn" type="button">Nach aktuellem N-Ziel</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="manage-section">
+          <h3>Speichern & Sicherung</h3>
+          <div class="manage-actions">
+            <button id="saveRouteBtn" class="primary" type="button">Lokal speichern</button>
+            <button id="loadLastRouteBtn" type="button">Letzte Route laden</button>
+            <button id="exportRouteBtn" type="button">JSON exportieren</button>
+            <button id="importRouteFileBtn" type="button">JSON-Sicherung laden</button>
+          </div>
+          <input id="routeFileInput" type="file" accept=".json,application/json" hidden />
+          <div id="storageStatus" class="storage-status">Änderungen werden nach dem ersten Start automatisch lokal gespeichert.</div>
+        </section>
+
+        <section class="manage-section">
+          <h3>Tourpunkte bearbeiten</h3>
+          <p>Punkte umbenennen, Koordinaten korrigieren, als Tagesziel N1/N2/… markieren oder löschen.</p>
+          <div id="managementPointList" class="point-edit-list" aria-live="polite"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="pointEditorModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pointEditorTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="pointEditorTitle" class="modal-title">Tourpunkt bearbeiten</h2>
+        <button id="closePointEditorBtn" class="secondary modal-close" type="button" aria-label="Bearbeitungsfenster schließen">×</button>
+      </div>
+      <div class="editor-grid">
+        <div class="editor-field">
+          <label class="editor-label" for="pointEditName">Name</label>
+          <input id="pointEditName" type="text" placeholder="z. B. Col du Galibier" />
+        </div>
+        <div class="editor-row">
+          <div class="editor-field">
+            <label class="editor-label" for="pointEditRole">Bedeutung</label>
+            <select id="pointEditRole">
+              <option value="normal">Zwischen-/Shaping-Punkt</option>
+              <option value="day">Tagesziel</option>
+            </select>
+          </div>
+          <div id="pointEditDayWrap" class="editor-field" hidden>
+            <label class="editor-label" for="pointEditDay">Tagesnummer</label>
+            <input id="pointEditDay" type="text" inputmode="numeric" placeholder="z. B. 1" />
+          </div>
+        </div>
+        <div class="editor-coords">
+          <div class="editor-field">
+            <label class="editor-label" for="pointEditLat">Breite</label>
+            <input id="pointEditLat" type="text" inputmode="decimal" placeholder="48.78123" />
+          </div>
+          <div class="editor-field">
+            <label class="editor-label" for="pointEditLon">Länge</label>
+            <input id="pointEditLon" type="text" inputmode="decimal" placeholder="9.38765" />
+          </div>
+        </div>
+        <div class="editor-note">Koordinaten können leer bleiben, wenn der Punkt über Name/Adresse navigiert werden soll. Tagesziele werden intern als N1, N2, N3 … gespeichert.</div>
+        <div class="manage-actions">
+          <button id="savePointEditBtn" class="primary" type="button">Änderung speichern</button>
+          <button id="deletePointEditBtn" class="danger" type="button">Tourpunkt löschen</button>
+          <button id="cancelPointEditBtn" type="button">Abbrechen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="controls">
     <button id="prevDay" class="secondary">Vorheriges N-Ziel</button>
     <button id="nextDay">Nächstes N-Ziel</button>
@@ -192,6 +302,10 @@ let points = [{"idx": 1, "name": "Aichschieß", "type": "start", "sym": "Flag, G
 const defaultRoute = JSON.parse(JSON.stringify(points));
 let currentDayIndex = 0;
 let lastImportKind = "Route des Grandes Alpes · Standardroute";
+let tourTitle = "Route des Grandes Alpes";
+let autosaveEnabled = false;
+let editingPointIndex = null;
+const ROUTE_STORAGE_KEY = "tourNavigatorModern.lastRoute.v1";
 
 function enc(s) { return encodeURIComponent(String(s || "")); }
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
@@ -537,6 +651,184 @@ function parseGpxRobust(txt) {
   return {points: [], kind: "unbekannt"};
 }
 
+
+
+function routeSnapshot() {
+  return {
+    format: "TourNavigatorModern-Backup",
+    version: 1,
+    savedAt: new Date().toISOString(),
+    tourTitle,
+    points: JSON.parse(JSON.stringify(points)),
+    lastImportKind,
+    currentDayIndex,
+    navApp: document.getElementById("navApp")?.value || "kurviger"
+  };
+}
+function storageStatus(message) {
+  const el = document.getElementById("storageStatus");
+  if (el) el.textContent = message;
+}
+function saveRouteLocal(showMessage=false) {
+  try {
+    localStorage.setItem(ROUTE_STORAGE_KEY, JSON.stringify(routeSnapshot()));
+    if (showMessage) storageStatus(`Lokal gespeichert: ${new Date().toLocaleString("de-DE")}`);
+    return true;
+  } catch (err) {
+    storageStatus("Lokales Speichern ist in diesem Browser nicht verfügbar.");
+    return false;
+  }
+}
+function applyRouteSnapshot(data, sourceLabel="Gespeicherte Route") {
+  if (!data || !Array.isArray(data.points)) throw new Error("Ungültige Routendatei");
+  points = JSON.parse(JSON.stringify(data.points));
+  renumberPoints();
+  tourTitle = String(data.tourTitle || "Meine Tour").trim() || "Meine Tour";
+  lastImportKind = sourceLabel;
+  currentDayIndex = Number.isFinite(data.currentDayIndex) ? data.currentDayIndex : 0;
+  const nav = document.getElementById("navApp");
+  if (nav && ["kurviger","waze","google","apple"].includes(data.navApp)) nav.value = data.navApp;
+  const input = document.getElementById("tourTitleInput");
+  if (input) input.value = tourTitle;
+  updateSelectedNav();
+  render();
+}
+function loadLastRoute() {
+  try {
+    const raw = localStorage.getItem(ROUTE_STORAGE_KEY);
+    if (!raw) { alert("Es ist noch keine lokal gespeicherte Route vorhanden."); return; }
+    applyRouteSnapshot(JSON.parse(raw), "Letzte lokal gespeicherte Route");
+    storageStatus("Letzte Route aus dem Browser geladen.");
+  } catch (err) {
+    alert("Die gespeicherte Route konnte nicht geladen werden.");
+  }
+}
+function safeFileName(value) {
+  return String(value || "TourNavigatorModern_Route")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9_-]+/g, "_").replace(/^_+|_+$/g, "").slice(0,60) || "TourNavigatorModern_Route";
+}
+function exportRouteFile() {
+  const blob = new Blob([JSON.stringify(routeSnapshot(), null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const now = new Date();
+  const date = now.toISOString().slice(0,10);
+  const time = String(now.getHours()).padStart(2,"0") + String(now.getMinutes()).padStart(2,"0");
+  a.href = url;
+  a.download = `${date}__${time}__TourNavigatorModern__${safeFileName(tourTitle)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  storageStatus("JSON-Sicherung erstellt.");
+}
+function stripDayPrefix(value) {
+  return String(value || "").replace(/^\s*[NT]\s*\d+\s*/i, "").trim();
+}
+function renderManagementPointList() {
+  const list = document.getElementById("managementPointList");
+  if (!list) return;
+  list.innerHTML = "";
+  if (!points.length) {
+    list.innerHTML = '<div class="storage-status">Die aktuelle Tour enthält noch keine Punkte.</div>';
+    return;
+  }
+  points.forEach((p,i) => {
+    const day = p.day || inferDay(p.name,p.type,i);
+    const row = document.createElement("div");
+    row.className = day ? "point-edit-row day-target" : "point-edit-row";
+    const label = day ? `N${day}` : String(i+1).padStart(2,"0");
+    const displayName = day ? cleanName(p.name) : (p.name || `Punkt ${i+1}`);
+    row.innerHTML = `
+      <div class="point-edit-index">${escapeHtml(label)}</div>
+      <div>
+        <div class="point-edit-name">${escapeHtml(displayName)}</div>
+        <div class="point-edit-meta">${day ? `Tagesziel N${day}` : roleLabel(p,null)} · ${hasCoords(p) ? `${p.lat.toFixed(5)}, ${p.lon.toFixed(5)}` : "Textziel"}</div>
+      </div>
+      <div class="point-edit-actions">
+        <button type="button" class="secondary" onclick="openMap(${i})">Karte</button>
+        <button type="button" onclick="openPointEditor(${i})">Bearbeiten</button>
+        <button type="button" class="danger" onclick="deletePoint(${i})">Löschen</button>
+      </div>`;
+    list.appendChild(row);
+  });
+}
+function togglePointDayInput() {
+  const isDay = document.getElementById("pointEditRole")?.value === "day";
+  const wrap = document.getElementById("pointEditDayWrap");
+  if (wrap) wrap.hidden = !isDay;
+}
+function openPointEditor(index) {
+  const p = points[index];
+  if (!p) return;
+  editingPointIndex = index;
+  const day = p.day || inferDay(p.name,p.type,index);
+  document.getElementById("pointEditName").value = stripDayPrefix(p.name);
+  document.getElementById("pointEditRole").value = day ? "day" : "normal";
+  document.getElementById("pointEditDay").value = day || "";
+  document.getElementById("pointEditLat").value = hasCoords(p) ? String(p.lat) : "";
+  document.getElementById("pointEditLon").value = hasCoords(p) ? String(p.lon) : "";
+  togglePointDayInput();
+  document.getElementById("pointEditorModal")?.classList.add("open");
+  document.getElementById("pointEditName")?.focus();
+}
+function closePointEditor() {
+  document.getElementById("pointEditorModal")?.classList.remove("open");
+  editingPointIndex = null;
+}
+function savePointEdit() {
+  if (!Number.isInteger(editingPointIndex) || !points[editingPointIndex]) return;
+  const name = document.getElementById("pointEditName").value.trim();
+  const role = document.getElementById("pointEditRole").value;
+  if (!name) { alert("Bitte einen verständlichen Namen eingeben."); return; }
+
+  let day = null;
+  if (role === "day") {
+    day = parseInt(document.getElementById("pointEditDay").value,10);
+    if (!Number.isInteger(day) || day < 1 || day > 99) { alert("Bitte eine Tagesnummer zwischen 1 und 99 eingeben."); return; }
+    const conflict = points.findIndex((p,i) => i !== editingPointIndex && (p.day || inferDay(p.name,p.type,i)) === day);
+    if (conflict >= 0) { alert(`Das Tagesziel N${day} ist bereits vergeben.`); return; }
+  }
+
+  const latRaw = normalizeDecimal(document.getElementById("pointEditLat").value);
+  const lonRaw = normalizeDecimal(document.getElementById("pointEditLon").value);
+  let lat = null, lon = null;
+  if (latRaw || lonRaw) {
+    lat = parseFloat(latRaw); lon = parseFloat(lonRaw);
+    if (!isValidLatLon(lat,lon)) { alert("Koordinaten bitte vollständig und gültig eingeben."); return; }
+  }
+
+  const p = points[editingPointIndex];
+  p.day = day;
+  p.name = day ? `N${day} ${stripDayPrefix(name)}` : stripDayPrefix(name);
+  p.q = p.name;
+  p.lat = lat; p.lon = lon;
+  if (day && !["start","destination"].includes(p.type)) p.type = "via";
+  lastImportKind = "Tour manuell bearbeitet";
+  closePointEditor();
+  render();
+  storageStatus("Tourpunkt geändert und automatisch lokal gespeichert.");
+}
+function deletePoint(index) {
+  const p = points[index];
+  if (!p) return;
+  const label = stripDayPrefix(p.name) || `Punkt ${index+1}`;
+  if (!confirm(`Tourpunkt „${label}“ wirklich löschen?`)) return;
+  points.splice(index,1);
+  renumberPoints();
+  currentDayIndex = Math.max(0, Math.min(currentDayIndex, Math.max(0,dayIds().length-1)));
+  lastImportKind = "Tour manuell bearbeitet";
+  render();
+  storageStatus("Tourpunkt gelöscht und automatisch lokal gespeichert.");
+}
+function openSettings() {
+  document.getElementById("settingsModal")?.classList.add("open");
+  const input = document.getElementById("tourTitleInput");
+  if (input) input.value = tourTitle;
+  renderManagementPointList();
+}
+function closeSettings() { document.getElementById("settingsModal")?.classList.remove("open"); }
+
+
 document.getElementById("navApp").addEventListener("change", updateSelectedNav);
 document.getElementById("openKurvigerRouteBtn").addEventListener("click", () => openKurvigerRoute());
 document.getElementById("prevDay").addEventListener("click", () => scrollDay(-1));
@@ -562,6 +854,7 @@ document.addEventListener("keydown", (e) => {
 document.getElementById("loadDefaultBtn").addEventListener("click", () => {
   points = JSON.parse(JSON.stringify(defaultRoute));
   lastImportKind = "Route des Grandes Alpes · Standardroute";
+  tourTitle = "Route des Grandes Alpes";
   currentDayIndex = 0;
   document.getElementById("manualText").value = "";
   document.getElementById("gpxInput").value = "";
@@ -633,6 +926,52 @@ document.getElementById("gpxInput").addEventListener("change", async (e) => {
 });
 
 
+const settingsModal = document.getElementById("settingsModal");
+const pointEditorModal = document.getElementById("pointEditorModal");
+document.getElementById("settingsBtn")?.addEventListener("click", openSettings);
+document.getElementById("closeSettingsBtn")?.addEventListener("click", closeSettings);
+settingsModal?.addEventListener("click", e => { if (e.target === settingsModal) closeSettings(); });
+document.getElementById("pointEditRole")?.addEventListener("change", togglePointDayInput);
+document.getElementById("savePointEditBtn")?.addEventListener("click", savePointEdit);
+document.getElementById("deletePointEditBtn")?.addEventListener("click", () => {
+  const index = editingPointIndex;
+  closePointEditor();
+  if (Number.isInteger(index)) deletePoint(index);
+});
+document.getElementById("cancelPointEditBtn")?.addEventListener("click", closePointEditor);
+document.getElementById("closePointEditorBtn")?.addEventListener("click", closePointEditor);
+pointEditorModal?.addEventListener("click", e => { if (e.target === pointEditorModal) closePointEditor(); });
+document.getElementById("saveTourTitleBtn")?.addEventListener("click", () => {
+  const value = document.getElementById("tourTitleInput").value.trim();
+  if (!value) { alert("Bitte einen Tournamen eingeben."); return; }
+  tourTitle = value;
+  render();
+  storageStatus("Tourname übernommen und automatisch lokal gespeichert.");
+});
+document.getElementById("tourTitleInput")?.addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("saveTourTitleBtn")?.click();
+});
+document.getElementById("saveRouteBtn")?.addEventListener("click", () => saveRouteLocal(true));
+document.getElementById("loadLastRouteBtn")?.addEventListener("click", loadLastRoute);
+document.getElementById("exportRouteBtn")?.addEventListener("click", exportRouteFile);
+document.getElementById("importRouteFileBtn")?.addEventListener("click", () => document.getElementById("routeFileInput")?.click());
+document.getElementById("routeFileInput")?.addEventListener("change", async e => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  try {
+    applyRouteSnapshot(JSON.parse(await file.text()), "Importierte Routensicherung");
+    storageStatus(`Sicherung geladen: ${file.name}`);
+  } catch (err) {
+    alert("Diese Datei ist keine gültige Tour-Navigator-Sicherung.");
+  } finally { e.target.value = ""; }
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && settingsModal?.classList.contains("open") && !pointEditorModal?.classList.contains("open")) closeSettings();
+  if (e.key === "Escape" && pointEditorModal?.classList.contains("open")) closePointEditor();
+});
+
+
 const navMeta = {
   kurviger: {label:"Kurviger", icon:"🏔️"},
   google: {label:"Google Maps", icon:"📍"},
@@ -663,17 +1002,26 @@ render = function() {
   originalRender();
   const rc = document.getElementById("routeCount");
   if (rc) rc.textContent = `${points.length} Punkte`;
+  const titleDisplay = document.getElementById("routeTitleDisplay");
+  if (titleDisplay) titleDisplay.textContent = tourTitle;
+  const titleInput = document.getElementById("tourTitleInput");
+  if (titleInput && document.activeElement !== titleInput) titleInput.value = tourTitle;
+  renderManagementPointList();
+  if (autosaveEnabled) saveRouteLocal(false);
 };
 
 
 function openTourAnimator() {
   const validPoints = (Array.isArray(points) ? points : [])
     .filter(p => Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lon)))
-    .map(p => ({
+    .map((p,i) => ({
       name: String(p.name || p.q || ""),
       type: String(p.type || ""),
       lat: Number(p.lat),
-      lon: Number(p.lon)
+      lon: Number(p.lon),
+      day: p.day || inferDay(p.name,p.type,i) || null,
+      idx: Number(p.idx || i + 1),
+      sym: String(p.sym || "")
     }));
 
   if (validPoints.length < 2) {
@@ -681,9 +1029,7 @@ function openTourAnimator() {
     return;
   }
 
-  const routeTitle =
-    document.querySelector(".route-summary strong")?.textContent?.trim()
-    || "Tour Navigator Route";
+  const routeTitle = tourTitle || document.getElementById("routeTitleDisplay")?.textContent?.trim() || "Tour Navigator Route";
 
   localStorage.setItem("tourNavigator.animationRoute", JSON.stringify({
     title: routeTitle,
@@ -701,6 +1047,7 @@ document.getElementById("openTourAnimatorBtn")
 
 updateSelectedNav();
 render();
+autosaveEnabled = true;
 </script>
 </body>
 </html>
