@@ -1,0 +1,7 @@
+Tour Navigator Modern V4.1.1
+
+- ChatGPT-Reiseplanungsexport in die Tourverwaltung integriert
+- Export gliedert Route anhand N1/N2/N3... in einzelne Reisetage
+- Enthält Start, Zwischenziele, Tagesziel, Koordinaten und Arbeitsauftrag für ChatGPT
+- Warnung bei fehlenden/doppelten Tagesnummern oder generischen Punktnamen
+- Bestehende Modern-Hauptansicht und Animator-Übergabe unverändert

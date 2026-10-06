@@ -67,7 +67,7 @@ footer{padding:18px;color:#4b5563;text-align:center;font-size:14px}
 @media(max-width:420px){.nav-tiles{display:flex;overflow-x:auto;padding-bottom:4px}.nav-tile{min-width:118px}.selected-hero .value{font-size:36px}.selected-hero{justify-content:flex-start}.features{grid-template-columns:1fr 1fr}h1{font-size:38px}.logo-mark{font-size:46px}}
 
 
-/* V4.1.0 – Tourverwaltung über Zahnrad */
+/* V4.1.1 – Tourverwaltung + ChatGPT-Reiseplanungsexport */
 .gear{cursor:pointer;transition:transform .18s ease,background .18s ease}.gear:hover{transform:rotate(18deg);background:rgba(255,255,255,.20)}
 .settings-modal{max-width:980px;max-height:90vh;overflow:auto;border-radius:22px 22px 14px 14px;padding:18px;background:#f8fafc}
 .settings-intro{margin:3px 0 14px;color:#64748b;font-size:13px;line-height:1.45}
@@ -237,6 +237,15 @@ N1 Hôtel Le Christania</pre>
           </div>
           <input id="routeFileInput" type="file" accept=".json,application/json" hidden />
           <div id="storageStatus" class="storage-status">Änderungen werden nach dem ersten Start automatisch lokal gespeichert.</div>
+        </section>
+
+        <section class="manage-section travel-export-panel">
+          <h3>Für ChatGPT-Reiseplanung</h3>
+          <p>Exportiert die Tour nach N1/N2/N3… in einzelne Reisetage mit Start, Zwischenzielen und Tagesziel. Die erzeugte JSON-Datei kannst du direkt in ChatGPT hochladen.</p>
+          <div class="manage-actions">
+            <button id="exportTravelPlanBtn" class="primary" type="button">Für ChatGPT-Reiseplanung exportieren</button>
+          </div>
+          <div class="storage-status">Vor dem Export die Tagesziele fortlaufend als N1, N2, N3 … markieren und wichtige Zwischenpunkte verständlich benennen.</div>
         </section>
 
         <section class="manage-section">
@@ -721,6 +730,108 @@ function exportRouteFile() {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   storageStatus("JSON-Sicherung erstellt.");
 }
+
+function pointForTravelExport(p, index) {
+  const day = p.day || inferDay(p.name, p.type, index);
+  return {
+    order: index + 1,
+    name: day ? cleanName(p.name) : String(p.name || `Punkt ${index + 1}`),
+    originalName: String(p.name || ""),
+    role: day ? "day_destination" : (p.type === "start" ? "start" : p.type === "destination" ? "destination" : "intermediate"),
+    dayNumber: day || null,
+    sourceType: p.type || "routepoint",
+    coordinates: hasCoords(p) ? {lat: p.lat, lon: p.lon} : null
+  };
+}
+
+function buildTravelDays() {
+  const dayTargets = points
+    .map((p, index) => ({p, index, day: p.day || inferDay(p.name, p.type, index)}))
+    .filter(x => Number.isInteger(x.day) && x.day > 0)
+    .sort((a, b) => a.index - b.index);
+
+  const days = [];
+  let previousTargetIndex = 0;
+
+  dayTargets.forEach((target, position) => {
+    const startIndex = position === 0 ? 0 : dayTargets[position - 1].index;
+    const segment = points.slice(startIndex, target.index + 1);
+    days.push({
+      dayNumber: target.day,
+      tabTitle: `Tag ${target.day}`,
+      start: segment.length ? pointForTravelExport(segment[0], startIndex) : null,
+      intermediateStops: segment.slice(1, -1).map((p, offset) => pointForTravelExport(p, startIndex + offset + 1)),
+      destination: pointForTravelExport(target.p, target.index)
+    });
+    previousTargetIndex = target.index;
+  });
+
+  const afterIndex = dayTargets.length ? previousTargetIndex + 1 : 0;
+  return {
+    days,
+    unassignedAfterLastDay: points.slice(afterIndex).map((p, offset) => pointForTravelExport(p, afterIndex + offset))
+  };
+}
+
+function travelPlanWarnings() {
+  const warnings = [];
+  const days = points.map((p,i) => p.day || inferDay(p.name,p.type,i)).filter(Boolean);
+  if (!days.length) warnings.push("Keine Tagesziele markiert. Bitte mindestens N1 anlegen.");
+  const duplicates = [...new Set(days.filter((d,i,a) => a.indexOf(d) !== i))];
+  if (duplicates.length) warnings.push(`Doppelte Tagesnummern: ${duplicates.map(d => `N${d}`).join(", ")}`);
+  const generic = points.filter(p => /^\s*(shaping point|routepoint|trackpunkt|wegpunkt)\s*\d*\s*$/i.test(String(p.name || ""))).length;
+  if (generic) warnings.push(`${generic} Punkt(e) haben noch allgemeine Namen und sollten verständlich umbenannt werden.`);
+  return warnings;
+}
+
+function travelPlanningSnapshot() {
+  const plan = buildTravelDays();
+  return {
+    format: "TourNavigator-ChatGPT-Reiseplanung",
+    version: 1,
+    createdAt: new Date().toISOString(),
+    sourceApp: "Tour Navigator Modern",
+    tourTitle,
+    requestedOutput: {
+      language: "Deutsch",
+      designReference: "Lugano Reiseplanung",
+      structure: "Eine ansprechende HTML-Reiseplanung mit einem eigenen Reiter pro Tag",
+      include: ["Tagesübersicht", "Start", "Zwischenziele", "Tagesziel", "Karten- und Navigationshinweise", "praktische Hinweise"]
+    },
+    userInstruction: "Erstelle aus dieser Tour eine hübsche Reiseplanung im Stil meiner Lugano-Reiseplanung. Verwende für jeden Reisetag einen eigenen Reiter und übernimm die Punkte in ihrer Reihenfolge.",
+    warnings: travelPlanWarnings(),
+    days: plan.days,
+    unassignedAfterLastDay: plan.unassignedAfterLastDay,
+    allRoutePoints: points.map(pointForTravelExport)
+  };
+}
+
+function exportTravelPlanFile() {
+  const plan = buildTravelDays();
+  const warnings = travelPlanWarnings();
+
+  if (!plan.days.length) {
+    alert("Für den Reiseplanungs-Export muss mindestens ein Tagesziel markiert sein. Bitte einen Punkt bearbeiten und als N1 kennzeichnen.");
+    return;
+  }
+
+  if (warnings.length && !confirm(`Hinweise vor dem Export:\n\n${warnings.join("\n")}\n\nTrotzdem exportieren?`)) return;
+
+  const blob = new Blob([JSON.stringify(travelPlanningSnapshot(), null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const now = new Date();
+  const date = now.toISOString().slice(0,10);
+  const time = String(now.getHours()).padStart(2,"0") + String(now.getMinutes()).padStart(2,"0");
+  a.href = url;
+  a.download = `${date}__${time}__TourNavigator_Reiseplanung__${safeFileName(tourTitle)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  storageStatus("Reiseplanungs-Export erstellt. Diese JSON-Datei direkt in ChatGPT hochladen.");
+}
+
 function stripDayPrefix(value) {
   return String(value || "").replace(/^\s*[NT]\s*\d+\s*/i, "").trim();
 }
@@ -954,6 +1065,7 @@ document.getElementById("tourTitleInput")?.addEventListener("keydown", e => {
 document.getElementById("saveRouteBtn")?.addEventListener("click", () => saveRouteLocal(true));
 document.getElementById("loadLastRouteBtn")?.addEventListener("click", loadLastRoute);
 document.getElementById("exportRouteBtn")?.addEventListener("click", exportRouteFile);
+document.getElementById("exportTravelPlanBtn")?.addEventListener("click", exportTravelPlanFile);
 document.getElementById("importRouteFileBtn")?.addEventListener("click", () => document.getElementById("routeFileInput")?.click());
 document.getElementById("routeFileInput")?.addEventListener("change", async e => {
   const file = e.target.files?.[0];
