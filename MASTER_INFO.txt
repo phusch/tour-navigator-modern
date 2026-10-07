@@ -1,0 +1,5 @@
+VERBINDLICHE MODERN-MASTERBASIS
+Version: Tour Navigator Modern V4.1.2 MASTER
+Standardroute: Route des Grandes Alpes gefahren
+Stand: 07.10.2026
+Weitere Änderungen sollen auf dieser Version aufbauen, sofern keine neuere Basis ausdrücklich festgelegt wird.

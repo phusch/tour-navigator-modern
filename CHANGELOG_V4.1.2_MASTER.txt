@@ -1,0 +1,14 @@
+Tour Navigator Modern V4.1.2 MASTER
+
+Basis: V4.1.1
+Neue Standardroute: Route des Grandes Alpes gefahren
+Quelle: 2026-10-07__0929__TourNavigatorModern__Route_des_Grandes_Alpes_gefahren.json
+Punkte: 35
+Navigation: kurviger
+
+Unverändert:
+- Tourverwaltung
+- Punktbearbeitung
+- lokales Speichern / JSON-Sicherung
+- ChatGPT-Reiseplanungsexport
+- Übergabe an Tour Animator
