@@ -83,12 +83,17 @@ footer{padding:18px;color:#4b5563;text-align:center;font-size:14px}
 @media(max-width:680px){.settings-modal{max-height:92vh}.manage-title-row,.settings-modal .single-point-row,.editor-row,.editor-coords{grid-template-columns:1fr}.point-edit-row{grid-template-columns:46px minmax(0,1fr)}.point-edit-actions{grid-column:1/-1;justify-content:stretch}.point-edit-actions button{flex:1}}
 
 </style>
+  <link rel="stylesheet" href="routen-ruhiger-look.css" id="rnQuietTheme">
+  <link rel="stylesheet" href="routen-speicher.css">
 </head>
 
 <body>
   <div class="app">
     <header>
       <button id="settingsBtn" class="gear" type="button" aria-label="Tourverwaltung öffnen" title="Tourverwaltung">⚙</button>
+      <button id="rnOpenStorage" class="rn-storage-launch" type="button" aria-label="Speichern und Backup öffnen" title="Speichern & Backup" aria-controls="rnStorageView">
+        <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h13l3 3v15H4z"/><path d="M7 3v7h10V3"/><rect x="7" y="14" width="10" height="7" rx="1"/></svg>
+      </button>
       <div class="hero">
         <div class="logo-mark" aria-hidden="true">🧭</div>
         <div>
@@ -166,7 +171,7 @@ N1 Hôtel Le Christania</pre>
       <p class="smallnote">Kurviger öffnet die Route mit mehreren Koordinaten-Wegpunkten. Waze, Google und Apple öffnen Einzelziele.</p>
 
       <section class="features">
-        <div class="feature">🛡️<b>Datenschutz</b><span>100% lokal im Browser</span></div>
+        <div class="feature">🛡️<b>Datenschutz</b><span>Lokal nutzbar · GitHub optional</span></div>
         <div class="feature">⚡<b>Schnell & Einfach</b><span>Keine Installation</span></div>
         <div class="feature">📱<b>Mobile optimiert</b><span>Perfekt fürs iPhone</span></div>
         <div class="feature">💜<b>Made for Biker</b><span>Für deine Touren</span></div>
@@ -305,6 +310,46 @@ N1 Hôtel Le Christania</pre>
     <button id="prevDay" class="secondary">Vorheriges N-Ziel</button>
     <button id="nextDay">Nächstes N-Ziel</button>
   </div>
+
+<section id="rnStorageView" class="rn-store" hidden aria-labelledby="rnTitle">
+  <div class="rn-store-inner">
+    <div class="rn-store-header"><button id="rnStorageBack" type="button" class="rn-back">← Zurück</button><h1 id="rnTitle">Speichern & Backup</h1></div>
+    <div id="rnLamp" class="rn-lamp warning" role="status">🟡 GitHub-Speicherstand noch nicht geprüft</div>
+    <div id="rnCloudMeta" class="rn-meta">GitHub-Revision: nicht geprüft · Letzte Speicherung: –</div>
+    <section id="rnAuthBox" class="rn-panel rn-auth-panel">
+      <div id="rnAuthStatus" class="rn-auth-status">⚪ Nicht angemeldet · für GitHub bitte anmelden</div>
+      <div id="rnAuthFields">
+        <label for="rnKey">Supabase Publishable Key</label><input id="rnKey" type="text" placeholder="sb_publishable_…" autocomplete="off" spellcheck="false">
+        <label for="rnEmail">E-Mail</label><input id="rnEmail" type="email" autocomplete="username" value="huschka@eventdesign.com">
+        <label for="rnPass">Passwort</label><input id="rnPass" type="password" autocomplete="current-password" placeholder="Nur bei erster Anmeldung">
+        <button type="button" id="rnLogin" class="rn-btn rn-muted">Anmelden</button>
+      </div>
+      <div id="rnSignedIn" hidden><span id="rnEmailDisplay"></span><button id="rnLogout" type="button" class="rn-btn rn-small rn-muted">Abmelden</button></div>
+    </section>
+    <section class="rn-panel rn-cloud">
+      <h2>GitHub <span>bevorzugter Speicher</span></h2>
+      <p>Deine aktuelle Route wird privat unter <code>tour-navigator/data.json</code> gespeichert.</p>
+      <button type="button" id="rnGithubSave" class="rn-btn rn-primary">☁ GitHub Speichern</button>
+      <button type="button" id="rnGithubLoad" class="rn-btn rn-secondary">↧ GitHub Laden</button>
+    </section>
+    <section class="rn-panel">
+      <h2>Lokaler Speicher</h2>
+      <div class="rn-two"><button type="button" id="rnLocalSave" class="rn-btn rn-muted">Lokal speichern</button><button type="button" id="rnLocalLoad" class="rn-btn rn-muted">Lokal laden</button></div>
+      <p>Verwendet den bisherigen Tour-Navigator-Browserspeicher.</p>
+    </section>
+    <section class="rn-panel">
+      <h2>JSON-Backup</h2>
+      <div class="rn-two"><button type="button" id="rnExport" class="rn-btn rn-muted">JSON exportieren</button><button type="button" id="rnImport" class="rn-btn rn-muted">JSON laden</button></div>
+      <input id="rnFile" type="file" accept=".json,application/json" hidden>
+    </section>
+    <section class="rn-panel rn-settings">
+      <h2>Darstellung</h2>
+      <p>Zurückhaltende Farben oder ursprüngliche Farbgebung. Die Routendaten bleiben dabei unverändert.</p>
+      <div class="rn-two"><button id="rnQuiet" type="button" class="rn-btn rn-muted">Ruhiger Look</button><button id="rnOriginal" type="button" class="rn-btn rn-muted">Originalfarben</button></div>
+    </section>
+    <div id="rnMessage" class="rn-message" aria-live="polite">Die bisherige lokale Speicherung bleibt bestehen. Beim Laden abweichender Daten wird gefragt.</div>
+  </div>
+</section>
 
 <script>
 let points = [{"idx":1,"name":"Aichschieß","type":"start","sym":"Flag, Green","lat":48.74844,"lon":9.3961,"q":"Aichschieß","day":null},{"idx":2,"name":"Hôtel Le Christania","type":"via","sym":"Flag, Blue","lat":46.2455,"lon":6.50551,"q":"Hôtel Le Christania","day":1},{"idx":3,"name":"Haute Savoie","type":"shaping","sym":"Waypoint","lat":46.23669,"lon":6.65372,"q":"Haute Savoie","day":null},{"idx":4,"name":"Col de l'Encrenaz","type":"shaping","sym":"Waypoint","lat":46.17269,"lon":6.63366,"q":"Col de l'Encrenaz","day":null},{"idx":5,"name":"Col de la Colombière","type":"shaping","sym":"Waypoint","lat":45.99216,"lon":6.47546,"q":"Col de la Colombière","day":null},{"idx":6,"name":"Col des Aravis","type":"shaping","sym":"Waypoint","lat":45.87227,"lon":6.46487,"q":"Col des Aravis","day":null},{"idx":7,"name":"Cormet de Roselend (mit Col de Méraillet)","type":"shaping","sym":"Waypoint","lat":45.69133,"lon":6.69062,"q":"Cormet de Roselend (mit Col de Méraillet)","day":null},{"idx":8,"name":"Col de l’Iseran","type":"shaping","sym":"Waypoint","lat":45.41711,"lon":7.03084,"q":"Col de l’Iseran","day":null},{"idx":9,"name":"Bonneval sur Pont!","type":"shaping","sym":"Waypoint","lat":45.37109,"lon":7.04706,"q":"Bonneval sur Pont!","day":null},{"idx":10,"name":"N2 Hotel L'Outa","type":"via","sym":"Flag, Blue","lat":45.2751,"lon":6.81589,"q":"N2 Hotel L'Outa","day":2},{"idx":11,"name":"Col du Télégraphe","type":"shaping","sym":"Waypoint","lat":45.20269,"lon":6.44462,"q":"Col du Télégraphe","day":null},{"idx":12,"name":"Col du Galibier","type":"shaping","sym":"Waypoint","lat":45.06414,"lon":6.40785,"q":"Col du Galibier","day":null},{"idx":13,"name":"N3 Hotel Vauban Briancon","type":"via","sym":"Flag, Blue","lat":44.89488,"lon":6.63313,"q":"N3 Hotel Vauban Briancon","day":3},{"idx":14,"name":"Col d'Izoard","type":"shaping","sym":"Waypoint","lat":44.82,"lon":6.73503,"q":"Col d'Izoard","day":null},{"idx":15,"name":"Col de la Bonette mit Restefond","type":"shaping","sym":"Waypoint","lat":44.32662,"lon":6.8075,"q":"Col de la Bonette mit Restefond","day":null},{"idx":16,"name":"N4 Hostellerie de Rimplas","type":"via","sym":"Flag, Blue","lat":44.06412,"lon":7.13064,"q":"N4 Hostellerie de Rimplas","day":4},{"idx":17,"name":"Col de Turini","type":"shaping","sym":"Waypoint","lat":43.97756,"lon":7.3916,"q":"Col de Turini","day":null},{"idx":18,"name":"San Martin","type":"shaping","sym":"Waypoint","lat":43.82479,"lon":7.18972,"q":"San Martin","day":null},{"idx":19,"name":"Castellane","type":"shaping","sym":"Waypoint","lat":43.846132,"lon":7.27508,"q":"Castellane","day":null},{"idx":20,"name":"N5 Annot Hotel","type":"via","sym":"Flag, Blue","lat":43.9661,"lon":6.66759,"q":"N5 Annot Hotel","day":5},{"idx":21,"name":"Gorge de Dalouis","type":"shaping","sym":"Waypoint","lat":44.04551,"lon":6.84202,"q":"Gorge de Dalouis","day":null},{"idx":22,"name":"Col de la Cayolle","type":"shaping","sym":"Waypoint","lat":44.25908,"lon":6.74401,"q":"Col de la Cayolle","day":null},{"idx":23,"name":"Route de Sigouret","type":"shaping","sym":"Waypoint","lat":44.62044,"lon":6.54878,"q":"Route de Sigouret","day":null},{"idx":24,"name":"N6 Hotel Christiana - la salle des alpes","type":"via","sym":"Flag, Blue","lat":44.94484,"lon":6.56266,"q":"N6 Hotel Christiana - la salle des alpes","day":6},{"idx":25,"name":"Alpe d'Huez","type":"shaping","sym":"Waypoint","lat":45.09298,"lon":6.07177,"q":"Alpe d'Huez","day":null},{"idx":26,"name":"Col du Glandon","type":"shaping","sym":"Waypoint","lat":45.23959,"lon":6.17554,"q":"Col du Glandon","day":null},{"idx":27,"name":"Col du Mollard","type":"shaping","sym":"Waypoint","lat":45.21047,"lon":6.33714,"q":"Col du Mollard","day":null},{"idx":28,"name":"Col de la Madeleine","type":"shaping","sym":"Waypoint","lat":45.43494,"lon":6.37551,"q":"Col de la Madeleine","day":null},{"idx":29,"name":"Pilatus Airport Courchevel","type":"via","sym":"Flag, Blue","lat":45.39641,"lon":6.6324,"q":"Pilatus Airport Courchevel","day":null},{"idx":30,"name":"N7 Radiana la Léchère","type":"via","sym":"Flag, Blue","lat":45.51717,"lon":6.48242,"q":"N7 Radiana la Léchère","day":7},{"idx":31,"name":"Chamonix Mont Blanc","type":"shaping","sym":"Waypoint","lat":45.92477,"lon":6.87954,"q":"Chamonix Mont Blanc","day":null},{"idx":32,"name":"Aigle","type":"shaping","sym":"Waypoint","lat":46.31244,"lon":6.94669,"q":"Aigle","day":null},{"idx":33,"name":"N8 Agora Swiss","type":"via","sym":"Flag, Blue","lat":46.51532,"lon":6.6277,"q":"N8 Agora Swiss","day":8},{"idx":34,"name":"Musee de l'aviation","type":"via","sym":"Flag, Blue","lat":46.84613,"lon":6.91674,"q":"Musee de l'aviation","day":null},{"idx":35,"name":"Destination Aichschieß","type":"destination","sym":"Flag, Red","lat":48.74721113321895,"lon":9.391942323517826,"q":"Destination Aichschieß","day":null}];
@@ -1160,6 +1205,31 @@ document.getElementById("openTourAnimatorBtn")
 updateSelectedNav();
 render();
 autosaveEnabled = true;
+
+// Additive Schnittstelle für Huschel App Speicher (Tour Navigator Modern V4.1.2 unverändert).
+window.HuschelRoutenBridge = Object.freeze({
+  read: () => routeSnapshot(),
+  apply: (data, label = "Huschel GitHub-Speicher") => {
+    if (!data || data.format !== "TourNavigatorModern-Backup" || !Array.isArray(data.points))
+      throw Error("Keine gültige Tour-Navigator-Routensicherung.");
+    applyRouteSnapshot(data, label);
+    saveRouteLocal(false);
+  },
+  localSave: () => saveRouteLocal(true),
+  localRaw: () => localStorage.getItem(ROUTE_STORAGE_KEY),
+  exportJson: () => exportRouteFile()
+});
+// Vorhandene Renderfunktion unverändert ausführen und danach nur Speicherstatus aktualisieren.
+const rnRenderUnchanged = render;
+render = function(...args) {
+  const result = rnRenderUnchanged(...args);
+  window.dispatchEvent(new Event("huschel:routen-geaendert"));
+  return result;
+};
+document.getElementById("navApp")?.addEventListener("change", () => {
+  window.dispatchEvent(new Event("huschel:routen-geaendert"));
+});
 </script>
+<script type="module" src="routen-speicher.js"></script>
 </body>
 </html>

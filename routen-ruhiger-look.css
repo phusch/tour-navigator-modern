@@ -1,0 +1,44 @@
+/* Optionaler ruhiger Look – nur CSS, die V4.1.2-Logik bleibt unberührt. */
+:root {
+  --bg:#f5f7f8; --ink:#202b35; --muted:#64727c; --navy:#172734;
+  --purple:#3c6176; --purple2:#36566a; --green:#376c5c;
+  --orange:#9b7650; --blue:#3f6b83; --line:#dce3e7; --card:#fff; --soft:#f1f5f6;
+}
+body {background:#f5f7f8;}
+.app {background:var(--bg)}
+header {background:#182b38;border-bottom-color:#d8e1e6}
+header:before {background:none}
+.logo-mark {filter:none}
+h1 {letter-spacing:-.035em}
+.card,.nav-tile,.point {box-shadow:0 4px 12px rgba(18,40,50,.04)}
+.nav-card,.input-card,.route-card,.actions-card {border-color:var(--line);background:#fff}
+.nav-card .section-title,.input-card .section-title,.route-card .section-title{color:#314c5b}
+.selected-hero {border-color:#a9bac5;box-shadow:none}
+.selected-hero .app-icon {background:#344e5d}
+.selected-hero .badge {background:#36596b}
+.nav-tile.active {outline:2px solid #52778c;background:#edf3f6}
+.quick-action {border-color:var(--line);box-shadow:none}
+.quick-action strong,.quick-action.import strong {color:#36566a}
+.quick-action .circle,.quick-action.import .circle {background:#3e6174}
+.route-summary {border:1px solid #d6dee3;background:#f7f9fa}
+.statusline {color:#62717e}
+.primary-action {background:#355c70;box-shadow:none}
+.share-action {border-color:#c8d5dc;color:#294459}
+.point.day {border-color:#8daab8;border-left:4px solid #567d8b}
+.point-panel,.point.day .point-panel {background:#edf3f6}
+.number {color:#365c70}
+.actions button {background:#426b7d}
+.actions button.secondary,.secondary {color:#36576a;border-color:#cad7df}
+.settings-modal {background:#f4f7f9}
+.manage-section {border-color:#d9e2e7;box-shadow:none}
+.manage-actions button {border-color:#c8d7df;color:#35576b}
+.manage-actions button.primary {background:#365e73;color:#fff}
+.point-edit-row.day-target {border-color:#a9bfca;background:#f0f5f7}
+.point-edit-index {background:#e5eef2;color:#3d6174}
+.point-edit-actions button {background:#426c7d}
+.point-edit-actions button.secondary {border-color:#cad7df;color:#34576a}
+.controls button {background:#355b70}
+.controls .secondary {color:#355b70;border-color:#c4d3dc}
+details.example-info {border-color:#cbd9e1}
+details.example-info summary {color:#35576a}
+#loadDefaultBtn,#clearRouteBtn,.manual-actions button {color:#36586b;border-color:#cbd9e0}

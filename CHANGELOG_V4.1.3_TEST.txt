@@ -1,0 +1,6 @@
+V4.1.3 – Huschel Speicher + zurückhaltender Look (TEST)
+Basis: unveränderte bestehende Tour Navigator Modern V4.1.2 Logik.
+Neu: separate Speicherseite, Speicher-Icon oben, Supabase Auto-Login,
+GitHub Laden/Speichern, Revisionen und Versionskonfliktschutz, lokale und JSON-
+Sicherung, abschaltbare dezente Farbgestaltung.
+KEINE Eingriffe in die Tourberechnung, Navi-Ziele, Tourpunkte oder GPX-Parser.
