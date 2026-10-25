@@ -4,8 +4,8 @@
   --purple:#3c6176; --purple2:#36566a; --green:#376c5c;
   --orange:#9b7650; --blue:#3f6b83; --line:#dce3e7; --card:#fff; --soft:#f1f5f6;
 }
-body {background:#f5f7f8;}
-.app {background:var(--bg)}
+body {background:#080b0f;} /* Dunkler äußerer Fensterrand statt grauer Seitenfläche */
+.app {background:var(--bg);box-shadow:0 0 0 1px #080b0f;}
 header {background:#182b38;border-bottom-color:#d8e1e6}
 header:before {background:none}
 .logo-mark {filter:none}
@@ -42,3 +42,6 @@ h1 {letter-spacing:-.035em}
 details.example-info {border-color:#cbd9e1}
 details.example-info summary {color:#35576a}
 #loadDefaultBtn,#clearRouteBtn,.manual-actions button {color:#36586b;border-color:#cbd9e0}
+
+/* Fensterränder: anthrazit statt der vorher sehr hellen grauen Umrandung. */
+.card,.nav-tile,.point,.feature,.manage-section,.selected-hero,.route-summary {border-color:#20262c;}
